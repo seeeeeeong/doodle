@@ -84,5 +84,70 @@ public class UserControllerTest {
         result.andExpect(status().is(ErrorCode.DUPLICATED_USER_NAME.getHttpStatus().value()));
     }
 
+    @Test
+    @WithAnonymousUser
+    public void 로그인() throws Exception {
+        String userName = "userName";
+        String password = "password";
 
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userName", userName);
+        requestMap.put("password", password);
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        // when
+        ResultActions result = mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+        // then
+        result.andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 로그인시_회원가입한적이_없다면_에러발생() throws Exception {
+        String userName = "userName";
+        String password = "password";
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userName", userName);
+        requestMap.put("password", password);
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        // when
+        when(userService.login(userName, password)).thenThrow(new DoodleApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        ResultActions result = mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+        // then
+        result.andExpect(status().is(ErrorCode.USER_NOT_FOUND.getHttpStatus().value()));
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 로그인시_비밀번호가_다르면_에러발생() throws Exception {
+        String userName = "userName";
+        String password = "password";
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userName", userName);
+        requestMap.put("password", password);
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        // when
+        when(userService.login(userName, password)).thenThrow(new DoodleApplicationException(ErrorCode.INVALID_PASSWORD));
+
+        ResultActions result = mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+        // then
+        result.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getHttpStatus().value()));
+
+    }
 }

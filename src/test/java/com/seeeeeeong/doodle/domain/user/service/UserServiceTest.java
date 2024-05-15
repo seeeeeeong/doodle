@@ -3,24 +3,17 @@ package com.seeeeeeong.doodle.domain.user.service;
 import com.seeeeeeong.doodle.common.exception.DoodleApplicationException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
 import com.seeeeeeong.doodle.domain.user.domain.User;
-import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.awaitility.Awaitility.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -31,6 +24,9 @@ public class UserServiceTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private PasswordEncoder encoder;
 
     @Test
     void 회원가입이_정상적으로_동작하는_경우() {
@@ -65,6 +61,22 @@ public class UserServiceTest {
                 () -> userService.join(userName, password));
 
         assertEquals(ErrorCode.DUPLICATED_USER_NAME, exception.getErrorCode());
+    }
+
+    @Test
+    void 로그인이_정상적으로_동작하는_경우() {
+        // given
+        String userName = "userName";
+        String password = "password";
+
+        User user = User.create(userName, password);
+
+        // when
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+
+        // then
+        assertDoesNotThrow(() -> userService.login(userName, password));
+
     }
 
 }

@@ -37,15 +37,13 @@ public class UserService {
         User savedUser = userRepository.save(User.create(userName, passwordEncoder.encode(password)));
 
         return new UserJoinResponse(savedUser.getId(), savedUser.getUsername());
-
     }
 
     @Transactional
     public JwtToken login(String userName, String password) {
+
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
 
         return jwtToken;
