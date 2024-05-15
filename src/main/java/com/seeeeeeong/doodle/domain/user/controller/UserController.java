@@ -21,7 +21,7 @@ public class UserController {
     // TODO : implement
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
-        UserJoinResponse response = userService.join(request);
+        UserJoinResponse response = userService.join(request.getUserName(), request.getPassword());
         return Response.success(response);
     }
 }

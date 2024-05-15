@@ -10,6 +10,11 @@ public class DoodleApplicationException extends RuntimeException{
     private ErrorCode errorCode;
     private String message;
 
+    public DoodleApplicationException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
+        this.message = null;
+    }
+
     @Override
     public String getMessage() {
 

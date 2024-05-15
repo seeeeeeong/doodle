@@ -18,13 +18,13 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public UserJoinResponse join(UserJoinRequest request) {
+    public UserJoinResponse join(String userName, String password) {
 
-        userRepository.findByUserName(request.getUserName()).ifPresent(it -> {
-            throw new DoodleApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated", request.getUserName()));
+        userRepository.findByUserName(userName).ifPresent(it -> {
+            throw new DoodleApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated", userName));
         });
 
-        User user = userRepository.save(User.create(request.getUserName(), request.getPassword()));
+        User user = userRepository.save(User.create(userName, password));
 
         return new UserJoinResponse(user.getId(), user.getUserName());
 
