@@ -17,5 +17,11 @@ spring.datasource:
   driver-class-name: org.postgresql.Driver
 
 jwt:
-  secret: 64461f01e1af406da538b9c48d801ce59142452199ff112fb5404c8e7e98e3ff
+  secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo3ODkwMTIzNDU2Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6
+  access-token-expire-time: 3600000
+  refresh-token-expire-time: 5184000000
 
+
+# UserDetailsService ? ????? ???? ???? ???? ?? ????? ??? ?? ???? ???? ??? ??.
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
