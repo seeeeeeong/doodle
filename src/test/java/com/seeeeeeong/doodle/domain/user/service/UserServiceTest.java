@@ -1,7 +1,8 @@
 package com.seeeeeeong.doodle.domain.user.service;
 
-import com.seeeeeeong.doodle.common.exception.DoodleApplicationException;
+import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
+import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @MockBean
-    private PasswordEncoder encoder;
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void 회원가입이_정상적으로_동작하는_경우() {
@@ -57,7 +61,7 @@ public class UserServiceTest {
         when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        DoodleApplicationException exception = assertThrows(DoodleApplicationException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> userService.join(userName, password));
 
         assertEquals(ErrorCode.DUPLICATED_USER_NAME, exception.getErrorCode());
@@ -68,14 +72,51 @@ public class UserServiceTest {
         // given
         String userName = "userName";
         String password = "password";
+        String encodedPassword = "encodedPassword";
 
-        User user = User.create(userName, password);
+
+        User user = User.create(userName, encodedPassword);
 
         // when
         when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
+        when(jwtTokenProvider.createAccessToken(user.getId(), user.getRole())).thenReturn("access-token");
+        when(jwtTokenProvider.createRefreshToken(user.getId(), user.getRole())).thenReturn("refresh-token");
 
         // then
         assertDoesNotThrow(() -> userService.login(userName, password));
+
+    }
+
+    @Test
+    void 로그인시_유저가_존재하지_않는경우() {
+        // given
+        String userName = "userName";
+        String password = "password";
+
+        // when
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(BusinessException.class, () -> userService.login(userName, password));
+
+    }
+
+    @Test
+    void 로그인시_비밀번호가_일치하지_않는경우() {
+        // given
+        String userName = "userName";
+        String password = "password";
+        String encodedPassword = "encodedPassword";
+
+        User user = User.create(userName, encodedPassword); 
+
+        // when
+        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
+
+        // then
+        assertThrows(BusinessException.class, () -> userService.login(userName, password));
 
     }
 

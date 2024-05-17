@@ -1,11 +1,10 @@
 package com.seeeeeeong.doodle.domain.user.service;
 
-import com.seeeeeeong.doodle.common.exception.DoodleApplicationException;
+import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
-import com.seeeeeeong.doodle.common.security.jwt.JwtToken;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
 import com.seeeeeeong.doodle.domain.user.domain.User;
-import com.seeeeeeong.doodle.domain.user.dto.UserJoinRequest;
+import com.seeeeeeong.doodle.domain.user.dto.ResponseJwtToken;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -31,22 +29,28 @@ public class UserService {
     public UserJoinResponse join(String userName, String password) {
 
         userRepository.findByUserName(userName).ifPresent(it -> {
-            throw new DoodleApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated", userName));
+            throw new BusinessException(ErrorCode.DUPLICATED_USER_NAME);
         });
 
         User savedUser = userRepository.save(User.create(userName, passwordEncoder.encode(password)));
 
-        return new UserJoinResponse(savedUser.getId(), savedUser.getUsername());
+        return new UserJoinResponse(savedUser.getId(), savedUser.getUserName());
     }
 
     @Transactional
-    public JwtToken login(String userName, String password) {
+    public ResponseJwtToken login(String userName, String password) {
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+       User user = userRepository.findByUserName(userName).orElseThrow(
+               () -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return jwtToken;
+       if (!passwordEncoder.matches(password, user.getPassword())) {
+           throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+       }
+
+       String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
+       String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getRole());
+
+       return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
     }
 
 }
