@@ -58,4 +58,17 @@ public class PostController {
         postService.deletePost(jwtTokenInfo.getUserId(), postId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<Void> like(@AuthUser JwtTokenInfo jwtTokenInfo,
+                                     @PathVariable Long postId) {
+        postService.like(jwtTokenInfo.getUserId(), postId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{postId}/likes")
+    public ResponseEntity<SuccessResponse<Integer>> getLikes(@AuthUser JwtTokenInfo jwtTokenInfo,
+                                            @PathVariable Long postId) {
+        return SuccessResponse.of(postService.getLikes(postId)).asHttp(HttpStatus.OK);
+    }
 }
