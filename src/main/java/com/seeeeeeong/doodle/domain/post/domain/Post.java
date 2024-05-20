@@ -1,18 +1,23 @@
 package com.seeeeeeong.doodle.domain.post.domain;
 
+import com.seeeeeeong.doodle.common.entity.BaseEntityWithUpdate;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "\"post\"")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@SQLDelete(sql = "UPDATED \"user\" SET deleted_at = NOW() where id=?")
-//@Where(clause = "deleted_at is NULL")
-public class Post {
+@SQLDelete(sql = "UPDATE \"post\" SET deleted_at = current_timestamp where post_id = ?")
+@Where(clause = "deleted_at is NULL")
+public class Post extends BaseEntityWithUpdate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +31,7 @@ public class Post {
 
     private String body;
 
-
+    private LocalDateTime deletedAt;
 
     private Post(User user, String title, String body) {
         this.user = user;
@@ -36,5 +41,10 @@ public class Post {
 
     public static Post of(User user, String title, String body) {
         return new Post(user, title, body);
+    }
+
+    public void updatePost(String title, String body) {
+        this.title = title;
+        this.body = body;
     }
 }

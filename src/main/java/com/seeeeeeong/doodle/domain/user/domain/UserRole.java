@@ -1,22 +1,18 @@
 package com.seeeeeeong.doodle.domain.user.domain;
 
 public enum UserRole {
-    USER(Authority.USER),
-    ADMIN(Authority.ADMIN);
 
-    private final String authority;
+    ADMIN("ROLE_ADMIN"),
+    USER("ROLE_USER");
 
-    UserRole(String authority) {
-        this.authority = authority;
+    private final String key;
+
+    UserRole(String key) {
+        this.key = key;
     }
 
-    public String getAuthority() {
-        return this.authority;
-    }
-
-    public static class Authority {
-        public static final String USER = "ROLE_USER";
-        public static final String ADMIN = "ROLE_ADMIN";
+    public String getKey() {
+        return key;
     }
 
 }

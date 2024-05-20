@@ -33,7 +33,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    void 회원가입이_정상적으로_동작하는_경우() {
+    void join() {
         // given
         String userName = "userName";
         String password = "password";
@@ -50,7 +50,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void 회원가입이_userName으로_회원가입한_유저가_이미_있는경우() {
+    void join_duplicated_user_name() {
         // given
         String userName = "userName";
         String password = "password";
@@ -59,8 +59,9 @@ public class UserServiceTest {
 
         // when
         when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
 
+        // then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> userService.join(userName, password));
 
@@ -68,7 +69,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void 로그인이_정상적으로_동작하는_경우() {
+    void login() {
         // given
         String userName = "userName";
         String password = "password";
@@ -80,8 +81,8 @@ public class UserServiceTest {
         // when
         when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
-        when(jwtTokenProvider.createAccessToken(user.getId(), user.getRole())).thenReturn("access-token");
-        when(jwtTokenProvider.createRefreshToken(user.getId(), user.getRole())).thenReturn("refresh-token");
+        when(jwtTokenProvider.createAccessToken(user.getUserId(), user.getRole())).thenReturn("access-token");
+        when(jwtTokenProvider.createRefreshToken(user.getUserId(), user.getRole())).thenReturn("refresh-token");
 
         // then
         assertDoesNotThrow(() -> userService.login(userName, password));
@@ -89,7 +90,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void 로그인시_유저가_존재하지_않는경우() {
+    void login_user_not_found() {
         // given
         String userName = "userName";
         String password = "password";
@@ -98,12 +99,15 @@ public class UserServiceTest {
         when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
         // then
-        assertThrows(BusinessException.class, () -> userService.login(userName, password));
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> userService.login(userName, password));
+
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
 
     }
 
     @Test
-    void 로그인시_비밀번호가_일치하지_않는경우() {
+    void login_invalid_password() {
         // given
         String userName = "userName";
         String password = "password";
@@ -116,8 +120,10 @@ public class UserServiceTest {
         when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
 
         // then
-        assertThrows(BusinessException.class, () -> userService.login(userName, password));
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> userService.login(userName, password));
 
+        assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
     }
 
 }
