@@ -1,4 +1,4 @@
-package com.seeeeeeong.doodle.common.configuration;
+package com.seeeeeeong.doodle.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeeeeeong.doodle.common.log.MDCRequestLoggingFilter;
@@ -6,7 +6,6 @@ import com.seeeeeeong.doodle.common.security.jwt.JwtAuthenticationEntryPoint;
 import com.seeeeeeong.doodle.common.security.jwt.JwtAuthenticationFilter;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,6 +45,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .rememberMe(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session

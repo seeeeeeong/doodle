@@ -8,9 +8,6 @@ import com.seeeeeeong.doodle.domain.user.dto.ResponseJwtToken;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +31,7 @@ public class UserService {
 
         User savedUser = userRepository.save(User.create(userName, passwordEncoder.encode(password)));
 
-        return new UserJoinResponse(savedUser.getId(), savedUser.getUserName());
+        return new UserJoinResponse(savedUser.getUserId(), savedUser.getUserName());
     }
 
     @Transactional
@@ -47,8 +44,8 @@ public class UserService {
            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
        }
 
-       String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
-       String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getRole());
+       String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(), user.getRole());
+       String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getRole());
 
        return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
     }

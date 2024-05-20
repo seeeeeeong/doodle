@@ -1,28 +1,20 @@
 package com.seeeeeeong.doodle.domain.user.domain;
 
+import com.seeeeeeong.doodle.common.entity.BaseEntityWithUpdate;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Entity
 @Getter
 @Table(name = "\"user\"")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntityWithUpdate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(name = "user_name")
     private String userName;

@@ -39,7 +39,7 @@ public class UserControllerTest {
 
     @Test
     @WithAnonymousUser
-    public void 회원가입() throws Exception{
+    public void join() throws Exception{
         // given
         final String userName = "userName";
         final String password = "password";
@@ -60,7 +60,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser
-    public void 회원가입시_이미_회원가입된_userName으로_회원가입_하는경우_에러반환() throws Exception{
+    public void join_duplicated_user_name() throws Exception{
         // given
         final String userName = "userName";
         final String password = "password";
@@ -83,9 +83,10 @@ public class UserControllerTest {
 
     @Test
     @WithAnonymousUser
-    public void 로그인() throws Exception {
-        String userName = "userName";
-        String password = "password";
+    public void login() throws Exception {
+        // given
+        final String userName = "userName";
+        final String password = "password";
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userName", userName);
@@ -104,9 +105,10 @@ public class UserControllerTest {
 
     @Test
     @WithAnonymousUser
-    public void 로그인시_회원가입한적이_없다면_에러발생() throws Exception {
-        String userName = "userName";
-        String password = "password";
+    public void login_user_not_found() throws Exception {
+        // given
+        final String userName = "userName";
+        final String password = "password";
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userName", userName);
@@ -127,9 +129,10 @@ public class UserControllerTest {
 
     @Test
     @WithAnonymousUser
-    public void 로그인시_비밀번호가_다르면_에러발생() throws Exception {
-        String userName = "userName";
-        String password = "password";
+    public void login_invalid_password() throws Exception {
+        // given
+        final String userName = "userName";
+        final String password = "password";
 
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("userName", userName);
@@ -145,6 +148,5 @@ public class UserControllerTest {
 
         // then
         result.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus()));
-
     }
 }

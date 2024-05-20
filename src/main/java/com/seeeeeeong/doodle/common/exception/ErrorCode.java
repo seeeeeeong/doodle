@@ -33,6 +33,11 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "U001", "회원을 찾을 수 없습니다."),
     DUPLICATED_USER_NAME(400, "U002",  "유저가 중복되었습니다."),
     INVALID_PASSWORD(403,"U003", "비밀번호가 일치하지 않습니다."),
+    INVALID_PERMISSION(400, "U004", "권한이 없습니다."),
+
+
+    // Post
+    POST_NOT_FOUND(404, "P001", "포스트를 찾을 수 없습니다."),
     ;
 
 
