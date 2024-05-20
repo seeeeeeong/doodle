@@ -1,8 +1,10 @@
 package com.seeeeeeong.doodle.domain.post.domain;
 
 import com.seeeeeeong.doodle.common.entity.BaseEntityWithUpdate;
+import com.seeeeeeong.doodle.domain.like.domain.Like;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,7 +26,8 @@ public class Post extends BaseEntityWithUpdate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
-    @ManyToOne
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -31,6 +35,10 @@ public class Post extends BaseEntityWithUpdate {
 
     private String body;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private List<Like> likes;
+    
     private LocalDateTime deletedAt;
 
     private Post(User user, String title, String body) {
