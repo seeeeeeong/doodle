@@ -68,7 +68,7 @@ public class PostController {
 
     @GetMapping("/{postId}/likes")
     public ResponseEntity<SuccessResponse<Integer>> getLikes(@AuthUser JwtTokenInfo jwtTokenInfo,
-                                            @PathVariable Long postId) {
+                                                             @PathVariable Long postId) {
         return SuccessResponse.of(postService.getLikes(postId)).asHttp(HttpStatus.OK);
     }
 }
