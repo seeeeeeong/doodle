@@ -190,8 +190,43 @@ public class PostControllerTest extends ControllerTestSetup {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody));
 
+        // then
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void like() throws Exception {
+        // given
+        Long userId = 1L;
+        String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(userId, UserRole.USER);
+        List<PostResponse> posts = new ArrayList<>();
+        posts.add(new PostResponse(1L, title, body, User.create("user1", "password")));
+
+        // when
+        ResultActions result = mockMvc.perform(post("/api/v1/posts/1/likes")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .header("Authorization", accessToken));
 
         // then
         result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void getLikes() throws Exception {
+        // given
+        Long userId = 1L;
+        String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(userId, UserRole.USER);
+        List<PostResponse> posts = new ArrayList<>();
+        posts.add(new PostResponse(1L, title, body, User.create("user1", "password")));
+
+        // when
+        when(postService.getLikes(posts.get(0).getPostId())).thenReturn(1);
+
+        ResultActions result = mockMvc.perform(get("/api/v1/posts/1/likes")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .header("Authorization", accessToken));
+
+        // then
+        result.andExpect(status().isOk());
     }
 }

@@ -38,7 +38,8 @@ public class Post extends BaseEntityWithUpdate {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private List<Like> likes;
-    
+
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     private Post(User user, String title, String body) {

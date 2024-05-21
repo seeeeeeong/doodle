@@ -46,7 +46,6 @@ public class UserServiceTest {
 
         // then
         assertDoesNotThrow(() -> userService.join(userName, password));
-
     }
 
     @Test

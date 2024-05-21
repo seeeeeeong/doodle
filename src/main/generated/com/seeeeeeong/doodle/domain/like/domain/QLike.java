@@ -1,4 +1,4 @@
-package com.seeeeeeong.doodle.domain.post.domain;
+package com.seeeeeeong.doodle.domain.like.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,55 +11,52 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QPost is a Querydsl query type for Post
+ * QLike is a Querydsl query type for Like
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QPost extends EntityPathBase<Post> {
+public class QLike extends EntityPathBase<Like> {
 
-    private static final long serialVersionUID = 1518008541L;
+    private static final long serialVersionUID = -1334743989L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QPost post = new QPost("post");
+    public static final QLike like = new QLike("like1");
 
     public final com.seeeeeeong.doodle.common.entity.QBaseEntityWithUpdate _super = new com.seeeeeeong.doodle.common.entity.QBaseEntityWithUpdate(this);
-
-    public final StringPath body = createString("body");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
 
-    public final ListPath<com.seeeeeeong.doodle.domain.like.domain.Like, com.seeeeeeong.doodle.domain.like.domain.QLike> likes = this.<com.seeeeeeong.doodle.domain.like.domain.Like, com.seeeeeeong.doodle.domain.like.domain.QLike>createList("likes", com.seeeeeeong.doodle.domain.like.domain.Like.class, com.seeeeeeong.doodle.domain.like.domain.QLike.class, PathInits.DIRECT2);
+    public final NumberPath<Long> likeId = createNumber("likeId", Long.class);
 
-    public final NumberPath<Long> postId = createNumber("postId", Long.class);
-
-    public final StringPath title = createString("title");
+    public final com.seeeeeeong.doodle.domain.post.domain.QPost post;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public final com.seeeeeeong.doodle.domain.user.domain.QUser user;
 
-    public QPost(String variable) {
-        this(Post.class, forVariable(variable), INITS);
+    public QLike(String variable) {
+        this(Like.class, forVariable(variable), INITS);
     }
 
-    public QPost(Path<? extends Post> path) {
+    public QLike(Path<? extends Like> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QPost(PathMetadata metadata) {
+    public QLike(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QPost(PathMetadata metadata, PathInits inits) {
-        this(Post.class, metadata, inits);
+    public QLike(PathMetadata metadata, PathInits inits) {
+        this(Like.class, metadata, inits);
     }
 
-    public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
+    public QLike(Class<? extends Like> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.post = inits.isInitialized("post") ? new com.seeeeeeong.doodle.domain.post.domain.QPost(forProperty("post"), inits.get("post")) : null;
         this.user = inits.isInitialized("user") ? new com.seeeeeeong.doodle.domain.user.domain.QUser(forProperty("user")) : null;
     }
 
