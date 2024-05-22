@@ -9,7 +9,7 @@ import lombok.Getter;
 public class UserResponse {
 
     private final Long userId;
-    private final String userName;
+    private final String username;
 
     public static UserResponse of(User user) {
         return new UserResponse(user.getUserId(), user.getUserName());
