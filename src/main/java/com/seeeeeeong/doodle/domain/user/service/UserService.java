@@ -3,11 +3,16 @@ package com.seeeeeeong.doodle.domain.user.service;
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
+import com.seeeeeeong.doodle.domain.alarm.dto.AlarmResponse;
+import com.seeeeeeong.doodle.domain.alarm.repository.AlarmRepository;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import com.seeeeeeong.doodle.domain.user.dto.ResponseJwtToken;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AlarmRepository alarmRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -48,6 +54,10 @@ public class UserService {
        String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(), user.getRole());
 
        return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
+    }
+
+    public Page<AlarmResponse> alarm(Long userId, int size, int page, Sort.Direction direction) {
+        return alarmRepository.alarm(userId, Pageable.ofSize(size).withPage(page), direction);
     }
 
 }
