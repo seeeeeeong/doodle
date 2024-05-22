@@ -6,6 +6,7 @@ import com.seeeeeeong.doodle.domain.alarm.domain.Alarm;
 import com.seeeeeeong.doodle.domain.alarm.domain.AlarmArgs;
 import com.seeeeeeong.doodle.domain.alarm.domain.AlarmType;
 import com.seeeeeeong.doodle.domain.alarm.repository.AlarmRepository;
+import com.seeeeeeong.doodle.domain.alarm.service.AlarmService;
 import com.seeeeeeong.doodle.domain.comment.domain.Comment;
 import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
 import com.seeeeeeong.doodle.domain.comment.repository.CommentRepository;
@@ -36,6 +37,7 @@ public class PostService {
         private final LikeRepository likeRepository;
         private final CommentRepository commentRepository;
         private final AlarmRepository alarmRepository;
+        private final AlarmService alarmService;
 
         @Transactional
         public CreatePostResponse createPost(Long userId, String title, String body) {
@@ -95,7 +97,8 @@ public class PostService {
                         });
 
                 likeRepository.save(Like.of(user, post));
-                alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
+                Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
+                alarmService.send(alarm.getAlarmId(), post.getUser().getUserId());
 
         }
 
@@ -115,7 +118,8 @@ public class PostService {
                         .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
                 commentRepository.save(Comment.of(comment, user, post));
-                alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
+                Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
+                alarmService.send(alarm.getAlarmId(), post.getUser().getUserId());
         }
 
         public Page<CommentResponse> getComments(Long postId, int size, int page, Direction direction) {
