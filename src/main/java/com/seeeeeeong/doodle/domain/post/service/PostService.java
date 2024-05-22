@@ -72,6 +72,7 @@ public class PostService {
                 }
 
                 likeRepository.deleteAllByPost(post);
+                commentRepository.deleteAllByPost(post);
                 postRepository.delete(post);
         }
 
@@ -99,7 +100,7 @@ public class PostService {
         }
 
         @Transactional
-        public void reply(Long userId, Long postId, String comment) {
+        public void comment(Long userId, Long postId, String comment) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
@@ -109,7 +110,11 @@ public class PostService {
                 commentRepository.save(Comment.of(comment, user, post));
         }
 
-        public Page<CommentResponse> getReplies(Long postId, int size, int page, Direction direction) {
-                return commentRepository.getReplies(postId, Pageable.ofSize(size).withPage(page), direction);
+        public Page<CommentResponse> getComments(Long postId, int size, int page, Direction direction) {
+
+                postRepository.findById(postId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+                return commentRepository.getComments(postId, Pageable.ofSize(size).withPage(page), direction);
         }
 }

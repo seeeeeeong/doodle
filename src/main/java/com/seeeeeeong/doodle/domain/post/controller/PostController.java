@@ -75,19 +75,19 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<Void> reply(@AuthUser JwtTokenInfo jwtTokenInfo,
+    public ResponseEntity<Void> comment(@AuthUser JwtTokenInfo jwtTokenInfo,
                                       @PathVariable Long postId,
                                       @RequestBody CommentRequest request) {
-        postService.reply(jwtTokenInfo.getUserId(), postId, request.getComment());
+        postService.comment(jwtTokenInfo.getUserId(), postId, request.getComment());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<SuccessResponse<Page<CommentResponse>>> getReplies(@AuthUser JwtTokenInfo jwtTokenInfo,
+    public ResponseEntity<SuccessResponse<Page<CommentResponse>>> getComments(@AuthUser JwtTokenInfo jwtTokenInfo,
                                                                              @PathVariable Long postId,
                                                                              @RequestParam(value = "size", required = false, defaultValue = "20") int size,
                                                                              @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                              @RequestParam(name = "direction", required = false, defaultValue = "DESC") Direction direction) {
-        return SuccessResponse.of(postService.getReplies(postId, size, page, direction)).asHttp(HttpStatus.OK);
+        return SuccessResponse.of(postService.getComments(postId, size, page, direction)).asHttp(HttpStatus.OK);
     }
 }

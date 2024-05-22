@@ -24,7 +24,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
 
     @Override
-    public Page<CommentResponse> getReplies(Long postId, Pageable pageable, Sort.Direction direction) {
+    public Page<CommentResponse> getComments(Long postId, Pageable pageable, Sort.Direction direction) {
 
         List<CommentResponse> content = queryFactory.select(
                 new QCommentResponse(comment1.commentId, comment1.comment, user.userId, user.userName, post.postId, comment1.createdAt, comment1.updatedAt, comment1.deletedAt))
