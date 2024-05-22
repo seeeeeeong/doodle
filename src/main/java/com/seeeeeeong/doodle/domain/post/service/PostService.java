@@ -2,6 +2,9 @@ package com.seeeeeeong.doodle.domain.post.service;
 
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
+import com.seeeeeeong.doodle.domain.comment.domain.Comment;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
+import com.seeeeeeong.doodle.domain.comment.repository.CommentRepository;
 import com.seeeeeeong.doodle.domain.like.domain.Like;
 import com.seeeeeeong.doodle.domain.like.repository.LikeRepository;
 import com.seeeeeeong.doodle.domain.post.domain.Post;
@@ -17,7 +20,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -28,6 +30,7 @@ public class PostService {
         private final UserRepository userRepository;
         private final PostRepository postRepository;
         private final LikeRepository likeRepository;
+        private final CommentRepository commentRepository;
 
         @Transactional
         public CreatePostResponse createPost(Long userId, String title, String body) {
@@ -69,6 +72,7 @@ public class PostService {
                 }
 
                 likeRepository.deleteAllByPost(post);
+                commentRepository.deleteAllByPost(post);
                 postRepository.delete(post);
         }
 
@@ -93,5 +97,24 @@ public class PostService {
                         .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
                 return likeRepository.countByPost(post);
+        }
+
+        @Transactional
+        public void comment(Long userId, Long postId, String comment) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+                Post post = postRepository.findById(postId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+                commentRepository.save(Comment.of(comment, user, post));
+        }
+
+        public Page<CommentResponse> getComments(Long postId, int size, int page, Direction direction) {
+
+                postRepository.findById(postId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+                return commentRepository.getComments(postId, Pageable.ofSize(size).withPage(page), direction);
         }
 }

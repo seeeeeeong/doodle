@@ -2,10 +2,12 @@ package com.seeeeeeong.doodle.domain.post.service;
 
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
+import com.seeeeeeong.doodle.domain.comment.domain.Comment;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
+import com.seeeeeeong.doodle.domain.comment.repository.CommentRepository;
 import com.seeeeeeong.doodle.domain.like.domain.Like;
 import com.seeeeeeong.doodle.domain.like.repository.LikeRepository;
 import com.seeeeeeong.doodle.domain.post.domain.Post;
-import com.seeeeeeong.doodle.domain.post.dto.CreatePostResponse;
 import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
 import com.seeeeeeong.doodle.domain.post.repository.PostRepository;
 import com.seeeeeeong.doodle.domain.user.domain.User;
@@ -15,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,9 @@ public class PostServiceTest {
 
     @MockBean
     private LikeRepository likeRepository;
+
+    @MockBean
+    private CommentRepository commentRepository;
 
     @Test
     void createPost() {
@@ -324,6 +329,127 @@ public class PostServiceTest {
         // then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> postService.getLikes(post.getPostId()));
+
+        assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void comment() {
+        // given
+        User user = User.create("userName", "password");
+
+        String title = "title";
+        String body = "body";
+
+        Post post = Post.of(user, title, body);
+        Comment comment = Comment.of("comment", user, post);
+
+        // when
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(postRepository.findById(post.getPostId())).thenReturn(Optional.of(post));
+        when(commentRepository.save(comment)).thenReturn(comment);
+
+        // then
+        assertDoesNotThrow(() -> postService.comment(user.getUserId(), post.getPostId(), "comment"));
+    }
+
+    @Test
+    void comment_user_not_found() {
+        // given
+        User user = User.create("userName", "password");
+
+        String title = "title";
+        String body = "body";
+
+        Post post = Post.of(user, title, body);
+        Comment comment = Comment.of("comment", user, post);
+
+        // when
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.empty());
+        when(postRepository.findById(post.getPostId())).thenReturn(Optional.of(post));
+        when(commentRepository.save(comment)).thenReturn(comment);
+
+        // then
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> postService.comment(user.getUserId(), post.getPostId(), "comment"));
+
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void comment_post_not_found() {
+        // given
+        User user = User.create("userName", "password");
+
+        String title = "title";
+        String body = "body";
+
+        Post post = Post.of(user, title, body);
+        Comment comment = Comment.of("comment", user, post);
+
+        // when
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(postRepository.findById(post.getPostId())).thenReturn(Optional.empty());
+        when(commentRepository.save(comment)).thenReturn(comment);
+
+        // then
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> postService.comment(user.getUserId(), post.getPostId(), "comment"));
+
+        assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+    }
+
+    @Test
+    void getComments() {
+        // given
+        User user = User.create("userName", "password");
+
+        String title = "title";
+        String body = "body";
+
+        int size = 20;
+        int page = 0;
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        Post post = Post.of(user, title, body);
+
+        Comment comment = Comment.of("comment", user, post);
+
+        List<CommentResponse> comments = new ArrayList<>();
+        comments.add(new CommentResponse(comment.getCommentId(), comment.getComment(), user.getUserId(), user.getUserName(), post.getPostId(), LocalDateTime.now(), null, null));
+
+        // when
+        when(postRepository.findById(post.getPostId())).thenReturn(Optional.of(post));
+        when(commentRepository.getComments(post.getPostId(), Pageable.ofSize(size).withPage(page), direction)).thenReturn(new PageImpl<>(comments));
+
+        // then
+        assertDoesNotThrow(() -> postService.getComments(post.getPostId(), size, page, direction));
+    }
+
+    @Test
+    void getComment_post_not_found() {
+        // given
+        User user = User.create("userName", "password");
+
+        String title = "title";
+        String body = "body";
+
+        int size = 20;
+        int page = 0;
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        Post post = Post.of(user, title, body);
+
+        List<CommentResponse> comments = new ArrayList<>();
+        comments.add(new CommentResponse(1L, "comment", user.getUserId(), user.getUserName(), post.getPostId(), LocalDateTime.now(), null, null));
+
+        // when
+        when(postRepository.findById(post.getPostId())).thenReturn(Optional.empty());
+        when(commentRepository.getComments(post.getPostId(), Pageable.ofSize(size).withPage(page), direction)).thenReturn(new PageImpl<>(comments));
+
+        // then
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> postService.getComments(post.getPostId(), size, page, direction));
 
         assertEquals(ErrorCode.POST_NOT_FOUND, exception.getErrorCode());
     }

@@ -5,6 +5,9 @@ import com.seeeeeeong.doodle.common.controller.ControllerTestSetup;
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
+import com.seeeeeeong.doodle.domain.comment.domain.Comment;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
+import com.seeeeeeong.doodle.domain.post.domain.Post;
 import com.seeeeeeong.doodle.domain.post.dto.CreatePostResponse;
 import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
 import com.seeeeeeong.doodle.domain.post.service.PostService;
@@ -26,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -225,6 +229,60 @@ public class PostControllerTest extends ControllerTestSetup {
         ResultActions result = mockMvc.perform(get("/api/v1/posts/1/likes")
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .header("Authorization", accessToken));
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    public void comment() throws Exception {
+        // given
+        Long userId = 1L;
+        String comment = "comment";
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("comment", comment);
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(userId, UserRole.USER);
+        List<PostResponse> posts = new ArrayList<>();
+        posts.add(new PostResponse(1L, title, body, User.create("user", "password")));
+
+        // when
+        ResultActions result = mockMvc.perform(post("/api/v1/posts/1/comments")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .header("Authorization", accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+        // then
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void getComments() throws Exception {
+        // given
+        Long userId = 1L;
+        String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(userId, UserRole.USER);
+        int size = 20;
+        int page = 0;
+        Sort.Direction direction = Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(direction,"post_id"));
+        List<PostResponse> posts = new ArrayList<>();
+        User user = User.create("userName", "password");
+        posts.add(new PostResponse(1L, title, body, user));
+
+        List<CommentResponse> comments = new ArrayList<>();
+        comments.add(new CommentResponse(1L, "comment", userId, user.getUserName(), posts.get(0).getPostId(), LocalDateTime.now(), null, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/v1/posts/1/comments")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .header("Authorization", accessToken)
+                .queryParam("size", String.valueOf(size))
+                .queryParam("page", String.valueOf(page))
+                .queryParam("direction", "ASC"));
 
         // then
         result.andExpect(status().isOk());

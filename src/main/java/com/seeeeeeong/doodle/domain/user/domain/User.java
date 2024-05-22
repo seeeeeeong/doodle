@@ -34,5 +34,4 @@ public class User extends BaseEntityWithUpdate {
         return new User(userName, password);
     }
 
-
 }
