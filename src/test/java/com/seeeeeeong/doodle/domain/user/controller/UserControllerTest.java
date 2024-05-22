@@ -1,32 +1,49 @@
 package com.seeeeeeong.doodle.domain.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seeeeeeong.doodle.common.controller.ControllerTestSetup;
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
+import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
+import com.seeeeeeong.doodle.domain.post.controller.PostController;
+import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
+import com.seeeeeeong.doodle.domain.user.domain.User;
+import com.seeeeeeong.doodle.domain.user.domain.UserRole;
 import com.seeeeeeong.doodle.domain.user.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class UserControllerTest extends ControllerTestSetup {
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,6 +53,14 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService)).build();
+    }
 
     @Test
     @WithAnonymousUser
@@ -149,4 +174,37 @@ public class UserControllerTest {
         // then
         result.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus()));
     }
+
+    @Test
+    public void alarm() throws Exception {
+        // given
+        Long userId = 1L;
+        String title = "title";
+        String body = "body";
+        String accessToken = "Bearer " + jwtTokenProvider.createAccessToken(userId, UserRole.USER);
+        int size = 20;
+        int page = 0;
+        Sort.Direction direction = Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(direction,"post_id"));
+        List<PostResponse> posts = new ArrayList<>();
+        User user = User.create("userName", "password");
+        posts.add(new PostResponse(1L, title, body, user));
+
+        List<CommentResponse> comments = new ArrayList<>();
+        comments.add(new CommentResponse(1L, "comment", userId, user.getUserName(), posts.get(0).getPostId(), LocalDateTime.now(), null, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/v1/users/alarm")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .header("Authorization", accessToken)
+                .queryParam("size", String.valueOf(size))
+                .queryParam("page", String.valueOf(page))
+                .queryParam("direction", "ASC"));
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
+
 }

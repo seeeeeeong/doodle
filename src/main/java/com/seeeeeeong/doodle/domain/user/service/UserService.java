@@ -57,11 +57,7 @@ public class UserService {
     }
 
     public Page<AlarmResponse> alarm(Long userId, int size, int page, Sort.Direction direction) {
-
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        return alarmRepository.alarm(user, Pageable.ofSize(size).withPage(page), direction);
+        return alarmRepository.alarm(userId, Pageable.ofSize(size).withPage(page), direction);
     }
 
 }

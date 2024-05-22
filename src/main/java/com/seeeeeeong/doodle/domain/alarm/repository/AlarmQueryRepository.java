@@ -9,6 +9,6 @@ import org.springframework.data.domain.Sort;
 
 public interface AlarmQueryRepository {
 
-    Page<AlarmResponse> alarm(User user, Pageable pageable, Sort.Direction direction);
+    Page<AlarmResponse> alarm(Long userId, Pageable pageable, Sort.Direction direction);
 
 }

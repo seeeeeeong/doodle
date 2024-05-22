@@ -23,12 +23,12 @@ public class AlarmQueryRepositoryImpl implements AlarmQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<AlarmResponse> alarm(User user, Pageable pageable, Sort.Direction direction) {
+    public Page<AlarmResponse> alarm(Long userId, Pageable pageable, Sort.Direction direction) {
 
         List<AlarmResponse> content = queryFactory.select(
                 new QAlarmResponse(alarm.alarmId, alarm.alarmType, alarm.args, alarm.createdAt, alarm.updatedAt, alarm.deletedAt))
                 .from(alarm)
-                .where(alarm.user.userId.eq(user.getUserId()))
+                .where(alarm.user.userId.eq(userId))
                 .orderBy(direction.isAscending() ? alarm.createdAt.asc() : alarm.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
