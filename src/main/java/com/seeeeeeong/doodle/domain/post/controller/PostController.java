@@ -3,6 +3,8 @@ package com.seeeeeeong.doodle.domain.post.controller;
 import com.seeeeeeong.doodle.common.resolver.AuthUser;
 import com.seeeeeeong.doodle.common.response.SuccessResponse;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenInfo;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentRequest;
+import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
 import com.seeeeeeong.doodle.domain.post.dto.CreatePostRequest;
 import com.seeeeeeong.doodle.domain.post.dto.CreatePostResponse;
 import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
@@ -70,5 +72,22 @@ public class PostController {
     public ResponseEntity<SuccessResponse<Integer>> getLikes(@AuthUser JwtTokenInfo jwtTokenInfo,
                                                              @PathVariable Long postId) {
         return SuccessResponse.of(postService.getLikes(postId)).asHttp(HttpStatus.OK);
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<Void> reply(@AuthUser JwtTokenInfo jwtTokenInfo,
+                                      @PathVariable Long postId,
+                                      @RequestBody CommentRequest request) {
+        postService.reply(jwtTokenInfo.getUserId(), postId, request.getComment());
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<SuccessResponse<Page<CommentResponse>>> getReplies(@AuthUser JwtTokenInfo jwtTokenInfo,
+                                                                             @PathVariable Long postId,
+                                                                             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+                                                                             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                             @RequestParam(name = "direction", required = false, defaultValue = "DESC") Direction direction) {
+        return SuccessResponse.of(postService.getReplies(postId, size, page, direction)).asHttp(HttpStatus.OK);
     }
 }

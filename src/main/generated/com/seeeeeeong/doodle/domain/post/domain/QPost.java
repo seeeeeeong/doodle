@@ -35,6 +35,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Long> postId = createNumber("postId", Long.class);
 
+    public final ListPath<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment> replies = this.<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment>createList("replies", com.seeeeeeong.doodle.domain.comment.domain.Comment.class, com.seeeeeeong.doodle.domain.comment.domain.QComment.class, PathInits.DIRECT2);
+
     public final StringPath title = createString("title");
 
     //inherited

@@ -1,6 +1,7 @@
 package com.seeeeeeong.doodle.domain.post.domain;
 
 import com.seeeeeeong.doodle.common.entity.BaseEntityWithUpdate;
+import com.seeeeeeong.doodle.domain.comment.domain.Comment;
 import com.seeeeeeong.doodle.domain.like.domain.Like;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -34,6 +35,10 @@ public class Post extends BaseEntityWithUpdate {
     private String title;
 
     private String body;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private List<Comment> replies;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
