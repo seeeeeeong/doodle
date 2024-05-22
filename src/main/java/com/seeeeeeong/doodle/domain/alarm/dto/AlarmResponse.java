@@ -1,10 +1,14 @@
-package com.seeeeeeong.doodle.domain.comment.dto;
+package com.seeeeeeong.doodle.domain.alarm.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.querydsl.core.annotations.QueryProjection;
+import com.seeeeeeong.doodle.domain.alarm.domain.AlarmArgs;
+import com.seeeeeeong.doodle.domain.alarm.domain.AlarmType;
 import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
+import com.seeeeeeong.doodle.domain.user.domain.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
@@ -15,13 +19,12 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class CommentResponse {
+public class AlarmResponse {
 
-    private Long commentId;
-    private String comment;
-    private Long userId;
-    private String userName;
-    private Long postId;
+    private Long alarmId;
+    private AlarmType alarmType;
+    private AlarmArgs args;
+    private String text;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -36,23 +39,21 @@ public class CommentResponse {
     private LocalDateTime deletedAt;
 
     @QueryProjection
-    public CommentResponse(Long commentId, String comment, Long userId,
-                           String userName, Long postId, LocalDateTime createdAt,
-                           LocalDateTime updatedAt, LocalDateTime deletedAt) {
-        this.commentId = commentId;
-        this.comment = comment;
-        this.userId = userId;
-        this.userName = userName;
-        this.postId = postId;
+    public AlarmResponse(Long alarmId, AlarmType alarmType, AlarmArgs args, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+        this.alarmId = alarmId;
+        this.alarmType = alarmType;
+        this.args = args;
+        this.text = alarmType.getAlarmText();
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
-    public static class Page extends PageImpl<CommentResponse> {
-        public Page(List<CommentResponse> content,
+    public static class Page extends PageImpl<AlarmResponse> {
+        public Page(List<AlarmResponse> content,
                     Pageable pageable, long total) {
             super(content, pageable, total);
         }
+
     }
 }

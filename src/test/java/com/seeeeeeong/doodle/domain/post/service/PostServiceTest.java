@@ -177,6 +177,8 @@ public class PostServiceTest {
 
         // when
         when(postRepository.findById(post.getPostId())).thenReturn(Optional.of(post));
+        doNothing().when(likeRepository).deleteAllByPost(post);
+        doNothing().when(commentRepository).deleteAllByPost(post);
         doNothing().when(postRepository).delete(post);
 
         // then
