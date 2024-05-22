@@ -4,6 +4,7 @@ import com.seeeeeeong.doodle.common.resolver.AuthUser;
 import com.seeeeeeong.doodle.common.response.SuccessResponse;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenInfo;
 import com.seeeeeeong.doodle.domain.alarm.dto.AlarmResponse;
+import com.seeeeeeong.doodle.domain.alarm.service.AlarmService;
 import com.seeeeeeong.doodle.domain.user.dto.ResponseJwtToken;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinRequest;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final AlarmService alarmService;
 
     @PostMapping("/join")
     public ResponseEntity<SuccessResponse<UserJoinResponse>> join(@RequestBody UserJoinRequest request) {
@@ -39,5 +42,10 @@ public class UserController {
                                                                       @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                       @RequestParam(name = "direction", required = false, defaultValue = "DESC") Sort.Direction direction) {
         return SuccessResponse.of(userService.alarm(jwtTokenInfo.getUserId(), size, page, direction)).asHttp(HttpStatus.OK);
+    }
+
+    @GetMapping("/alarm/subscribe")
+    public SseEmitter subscribe(@AuthUser JwtTokenInfo jwtTokenInfo) {
+        return alarmService.connectAlarm(jwtTokenInfo.getUserId());
     }
 }

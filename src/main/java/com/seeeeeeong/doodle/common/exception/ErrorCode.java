@@ -38,7 +38,11 @@ public enum ErrorCode {
 
     // Post
     POST_NOT_FOUND(404, "P001", "포스트를 찾을 수 없습니다."),
-    ALREADY_LIKED_POST(404, "P002", "이미 좋아요한 포스트입니다.")
+    ALREADY_LIKED_POST(404, "P002", "이미 좋아요한 포스트입니다."),
+
+    // Alarm
+    ALARM_CONNECT_ERROR(500, "A001", "연결할 수 없습니다."),
+
     ;
 
 
