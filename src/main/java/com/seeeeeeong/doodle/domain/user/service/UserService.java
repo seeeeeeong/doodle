@@ -8,6 +8,7 @@ import com.seeeeeeong.doodle.domain.alarm.repository.AlarmRepository;
 import com.seeeeeeong.doodle.domain.user.domain.User;
 import com.seeeeeeong.doodle.domain.user.dto.ResponseJwtToken;
 import com.seeeeeeong.doodle.domain.user.dto.UserJoinResponse;
+import com.seeeeeeong.doodle.domain.user.repository.UserCacheRepository;
 import com.seeeeeeong.doodle.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public class UserService {
     private final AlarmRepository alarmRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-
+    private final UserCacheRepository userCacheRepository;
 
     @Transactional
     public UserJoinResponse join(String userName, String password) {
@@ -43,10 +44,13 @@ public class UserService {
     @Transactional
     public ResponseJwtToken login(String userName, String password) {
 
-       User user = userRepository.findByUserName(userName).orElseThrow(
-               () -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userCacheRepository.getUser(userName).orElseGet(() ->
+                userRepository.findByUserName(userName).orElseThrow(
+                        () -> new BusinessException(ErrorCode.USER_NOT_FOUND)));
 
-       if (!passwordEncoder.matches(password, user.getPassword())) {
+        userCacheRepository.setUser(user);
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
        }
 
