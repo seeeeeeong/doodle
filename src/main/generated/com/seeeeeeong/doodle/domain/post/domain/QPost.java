@@ -26,6 +26,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final StringPath body = createString("body");
 
+    public final ListPath<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment> comments = this.<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment>createList("comments", com.seeeeeeong.doodle.domain.comment.domain.Comment.class, com.seeeeeeong.doodle.domain.comment.domain.QComment.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -34,8 +36,6 @@ public class QPost extends EntityPathBase<Post> {
     public final ListPath<com.seeeeeeong.doodle.domain.like.domain.Like, com.seeeeeeong.doodle.domain.like.domain.QLike> likes = this.<com.seeeeeeong.doodle.domain.like.domain.Like, com.seeeeeeong.doodle.domain.like.domain.QLike>createList("likes", com.seeeeeeong.doodle.domain.like.domain.Like.class, com.seeeeeeong.doodle.domain.like.domain.QLike.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> postId = createNumber("postId", Long.class);
-
-    public final ListPath<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment> replies = this.<com.seeeeeeong.doodle.domain.comment.domain.Comment, com.seeeeeeong.doodle.domain.comment.domain.QComment>createList("replies", com.seeeeeeong.doodle.domain.comment.domain.Comment.class, com.seeeeeeong.doodle.domain.comment.domain.QComment.class, PathInits.DIRECT2);
 
     public final StringPath title = createString("title");
 

@@ -5,6 +5,7 @@ import com.seeeeeeong.doodle.common.controller.ControllerTestSetup;
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
 import com.seeeeeeong.doodle.common.security.jwt.JwtTokenProvider;
+import com.seeeeeeong.doodle.domain.alarm.service.AlarmService;
 import com.seeeeeeong.doodle.domain.comment.dto.CommentResponse;
 import com.seeeeeeong.doodle.domain.post.controller.PostController;
 import com.seeeeeeong.doodle.domain.post.dto.PostResponse;
@@ -55,11 +56,14 @@ public class UserControllerTest extends ControllerTestSetup {
     private UserService userService;
 
     @MockBean
+    private AlarmService alarmService;
+
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService, alarmService)).build();
     }
 
     @Test

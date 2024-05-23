@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "\"comment\"")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE \"comment\" SET deleted_at = current_timestamp where like_id = ?")
+@SQLDelete(sql = "UPDATE \"comment\" SET deleted_at = current_timestamp where comment_id = ?")
 @Where(clause = "deleted_at is NULL")
 public class Comment extends BaseEntityWithUpdate {
 

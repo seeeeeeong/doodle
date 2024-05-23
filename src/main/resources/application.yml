@@ -13,6 +13,21 @@ spring:
       port: 6379
       host: 127.0.0.1
 
+  kafka:
+    bootstrap-servers: localhost:10000
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: alarm
+      auto-offset-reset: latest
+      key-serializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    template:
+      default-topic: alarm
+    listener:
+      ack-mode: MANUAL
+
 
 spring.datasource:
   hikari.maximum-pool-size: 4

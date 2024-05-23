@@ -76,8 +76,8 @@ public class PostController {
 
     @PostMapping("/{postId}/comments")
     public ResponseEntity<Void> comment(@AuthUser JwtTokenInfo jwtTokenInfo,
-                                      @PathVariable Long postId,
-                                      @RequestBody CommentRequest request) {
+                                        @PathVariable Long postId,
+                                        @RequestBody CommentRequest request) {
         postService.comment(jwtTokenInfo.getUserId(), postId, request.getComment());
         return ResponseEntity.noContent().build();
     }

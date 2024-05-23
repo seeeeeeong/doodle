@@ -37,8 +37,8 @@ public class Post extends BaseEntityWithUpdate {
     private String body;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private List<Comment> replies;
+    @JoinColumn(name = "post_id")
+    private List<Comment> comments;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")

@@ -2,8 +2,10 @@ package com.seeeeeeong.doodle.domain.post.service;
 
 import com.seeeeeeong.doodle.common.exception.BusinessException;
 import com.seeeeeeong.doodle.common.exception.ErrorCode;
+import com.seeeeeeong.doodle.common.producer.AlarmProducer;
 import com.seeeeeeong.doodle.domain.alarm.domain.Alarm;
 import com.seeeeeeong.doodle.domain.alarm.domain.AlarmArgs;
+import com.seeeeeeong.doodle.domain.alarm.domain.AlarmEvent;
 import com.seeeeeeong.doodle.domain.alarm.domain.AlarmType;
 import com.seeeeeeong.doodle.domain.alarm.repository.AlarmRepository;
 import com.seeeeeeong.doodle.domain.alarm.service.AlarmService;
@@ -38,6 +40,7 @@ public class PostService {
         private final CommentRepository commentRepository;
         private final AlarmRepository alarmRepository;
         private final AlarmService alarmService;
+        private final AlarmProducer alarmProducer;
 
         @Transactional
         public CreatePostResponse createPost(Long userId, String title, String body) {
@@ -97,8 +100,8 @@ public class PostService {
                         });
 
                 likeRepository.save(Like.of(user, post));
-                Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
-                alarmService.send(alarm.getAlarmId(), post.getUser().getUserId());
+                alarmProducer.send(new AlarmEvent(post.getUser().getUserId(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
+
 
         }
 
@@ -118,8 +121,7 @@ public class PostService {
                         .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
                 commentRepository.save(Comment.of(comment, user, post));
-                Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
-                alarmService.send(alarm.getAlarmId(), post.getUser().getUserId());
+                alarmProducer.send(new AlarmEvent(post.getUser().getUserId(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getUserId(), post.getPostId())));
         }
 
         public Page<CommentResponse> getComments(Long postId, int size, int page, Direction direction) {
