@@ -108,3 +108,39 @@ services:
       - Kafka02Service
     networks:
       - kafka_network
+
+  database:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: doodle_db
+      POSTGRES_USER: doodle
+      POSTGRES_PASSWORD: doodle
+    volumes:
+      - ./docker-postgres:/var/lib/postgresql/data
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./docker-redis:/data
+
+  application:
+    container_name: doodle
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/doodle_db
+      SPRING_DATASOURCE_USERNAME: doodle
+      SPRING_DATASOURCE_PASSWORD: doodle
+    depends_on:
+      - database
+      - cache
