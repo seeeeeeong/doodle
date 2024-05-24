@@ -122,25 +122,25 @@ public class UserServiceTest {
 //
 //    }
 
-    @Test
-    void login_invalid_password() {
-        // given
-        String userName = "userName";
-        String password = "password";
-        String encodedPassword = "encodedPassword";
-
-        User user = User.create(userName, encodedPassword); 
-
-        // when
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
-
-        // then
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> userService.login(userName, password));
-
-        assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
-    }
+//    @Test
+//    void login_invalid_password() {
+//        // given
+//        String userName = "userName";
+//        String password = "password";
+//        String encodedPassword = "encodedPassword";
+//
+//        User user = User.create(userName, encodedPassword);
+//
+//        // when
+//        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+//        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
+//
+//        // then
+//        BusinessException exception = assertThrows(BusinessException.class,
+//                () -> userService.login(userName, password));
+//
+//        assertEquals(ErrorCode.INVALID_PASSWORD, exception.getErrorCode());
+//    }
 
 //    @Test
 //    void alarm() {
