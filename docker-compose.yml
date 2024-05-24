@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  kafka_network:
+  app_network:
 
 volumes:
   Kafka00:
@@ -12,10 +12,35 @@ volumes:
     driver: local
 
 services:
+  database:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: doodle_db
+      POSTGRES_USER: doodle
+      POSTGRES_PASSWORD: doodle
+    networks:
+      - app_network
+    volumes:
+      - ./docker-postgres:/var/lib/postgresql/data
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./docker-redis:/data
+    networks:
+      - app_network
+
   Kafka00Service:
     image: bitnami/kafka:3.5.1-debian-11-r44
-    restart: unless-stopped
     container_name: Kafka00Container
+    restart: unless-stopped
     ports:
       - '10000:9094'
     environment:
@@ -34,7 +59,7 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
     networks:
-      - kafka_network
+      - app_network
     volumes:
       - Kafka00:/bitnami/kafka
 
@@ -60,7 +85,7 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
     networks:
-      - kafka_network
+      - app_network
     volumes:
       - Kafka01:/bitnami/kafka
 
@@ -86,7 +111,7 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
     networks:
-      - kafka_network
+      - app_network
     volumes:
       - Kafka02:/bitnami/kafka
 
@@ -107,28 +132,8 @@ services:
       - Kafka01Service
       - Kafka02Service
     networks:
-      - kafka_network
+      - app_network
 
-  database:
-    container_name: postgres
-    image: postgres:latest
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: doodle_db
-      POSTGRES_USER: doodle
-      POSTGRES_PASSWORD: doodle
-    volumes:
-      - ./docker-postgres:/var/lib/postgresql/data
-
-  cache:
-    container_name: redis
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - ./docker-redis:/data
 
   application:
     container_name: doodle
@@ -141,6 +146,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/doodle_db
       SPRING_DATASOURCE_USERNAME: doodle
       SPRING_DATASOURCE_PASSWORD: doodle
+      SPRING_REDIS_HOST: cache
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET_KEY: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo3ODkwMTIzNDU2Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6
     depends_on:
       - database
       - cache
+      - Kafka00Service
+      - Kafka01Service
+      - Kafka02Service
+    networks:
+      - app_network

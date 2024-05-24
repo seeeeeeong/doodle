@@ -8,10 +8,6 @@ spring:
         format_sql: true
     show-sql: true
 
-  data:
-    redis:
-      port: 6379
-      host: localhost
 
   kafka:
     bootstrap-servers: localhost:10000
@@ -28,6 +24,16 @@ spring:
     listener:
       ack-mode: MANUAL
 
+  data:
+    redis:
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 10
+          max-wait: 2
+      host: cache
+      port: 6379
+
 
 spring.datasource:
   hikari.maximum-pool-size: 4
@@ -43,6 +49,5 @@ jwt:
   refresh-token-expire-time: 5184000000
 
 
-# UserDetailsService ? ????? ???? ???? ???? ?? ????? ??? ?? ???? ???? ??? ??.
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
