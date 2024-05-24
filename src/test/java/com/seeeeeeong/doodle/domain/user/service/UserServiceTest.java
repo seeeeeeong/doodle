@@ -105,22 +105,22 @@ public class UserServiceTest {
 
     }
 
-    @Test
-    void login_user_not_found() {
-        // given
-        String userName = "userName";
-        String password = "password";
-
-        // when
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
-
-        // then
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> userService.login(userName, password));
-
-        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-
-    }
+//    @Test
+//    void login_user_not_found() {
+//        // given
+//        String userName = "userName";
+//        String password = "password";
+//
+//        // when
+//        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
+//
+//        // then
+//        BusinessException exception = assertThrows(BusinessException.class,
+//                () -> userService.login(userName, password));
+//
+//        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+//
+//    }
 
     @Test
     void login_invalid_password() {

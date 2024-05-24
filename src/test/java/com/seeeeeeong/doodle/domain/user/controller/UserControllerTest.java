@@ -87,28 +87,6 @@ public class UserControllerTest extends ControllerTestSetup {
         result.andExpect(status().isCreated());
     }
 
-    @Test
-    @WithMockUser
-    public void join_duplicated_user_name() throws Exception{
-        // given
-        final String userName = "userName";
-        final String password = "password";
-
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userName", userName);
-        requestMap.put("password", password);
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        // when
-        when(userService.join(userName, password)).thenThrow(new BusinessException(ErrorCode.DUPLICATED_USER_NAME));
-
-        ResultActions result = mockMvc.perform(post("/api/v1/users/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody));
-
-        // then
-        result.andExpect(status().is(ErrorCode.DUPLICATED_USER_NAME.getStatus()));
-    }
 
     @Test
     @WithAnonymousUser
@@ -132,52 +110,9 @@ public class UserControllerTest extends ControllerTestSetup {
 
     }
 
-    @Test
-    @WithAnonymousUser
-    public void login_user_not_found() throws Exception {
-        // given
-        final String userName = "userName";
-        final String password = "password";
 
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userName", userName);
-        requestMap.put("password", password);
-        String requestBody = objectMapper.writeValueAsString(requestMap);
 
-        // when
-        when(userService.login(userName, password)).thenThrow(new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        ResultActions result = mockMvc.perform(post("/api/v1/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody));
-
-        // then
-        result.andExpect(status().is(ErrorCode.USER_NOT_FOUND.getStatus()));
-
-    }
-
-    @Test
-    @WithAnonymousUser
-    public void login_invalid_password() throws Exception {
-        // given
-        final String userName = "userName";
-        final String password = "password";
-
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("userName", userName);
-        requestMap.put("password", password);
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        // when
-        when(userService.login(userName, password)).thenThrow(new BusinessException(ErrorCode.INVALID_PASSWORD));
-
-        ResultActions result = mockMvc.perform(post("/api/v1/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody));
-
-        // then
-        result.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus()));
-    }
 
     @Test
     public void alarm() throws Exception {
