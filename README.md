@@ -7,7 +7,7 @@
 <br>
 
 ### 프로젝트 아키텍처
-
+![doodle](https://github.com/seeeeeeong/doodle/assets/136677284/90e2959a-8f2c-49ba-a509-2d16f98d9f2b)
 
 
 ### 기술 스택
