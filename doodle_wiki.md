@@ -45,7 +45,17 @@
 
 - User 정보가 필요한 api를 요청할 때 @AuthUser를 인식하고 인증처리를 위한 ArgumentResolver 실행
 
+<hr>
 
+### Page
+
+![image](https://github.com/seeeeeeong/doodle/assets/136677284/96fa0aac-9f3f-479a-9c4e-72b6a1f09a43)
+
+- QueryDsl 을 사용하여 Page처리, content, countQuery 분리
+- PageableExecutionUtils를 사용하여 countQuery를 필요한 시점(전체 페이지 수, 마지막 페이지 계산)에만 실행하여 쿼리 실행을 최소화하고 성능 최적화
+<hr>
+
+  
 ### Alarm
 
 #### Alarm Entity
@@ -56,6 +66,7 @@
 
 - userId를 기준으로 알림을 조회할 때, 인덱스가 없으면 데이터베이스는 모든 행을 스캔
 - 인덱스 사용시 효율적으로 userId를 가진 행을 찾을 수 있다.
+<hr>
 
 
 #### kafka
@@ -74,6 +85,7 @@
 
 - Alarm Topic의 파티션에서 메시지를 가져와 alarmService.send()
 - ack.acknowledge() 함수로 Producer에게 메시지를 받았다는 응답
+<hr>
 
 #### SSE
 
